@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIV Device Management | SAP CAP Server</title>
+    <link href="https://unpkg.com/@sap-theming/theming-base-content/content/Base/baseLib/sap_fiori_3/css_variables.css" rel="stylesheet">
+    <style>
+        :root {
+            --sapBrandColor: #0a6ed1;
+            --sapBackgroundColor: #f7f7f7;
+            --sapTileBackground: #ffffff;
+            --sapTileBorder: 1px solid #d9d9d9;
+            --sapCardShadow: 0 0 0.5rem rgba(0,0,0,0.08);
+            --sapTextColor: #32363a;
+            --sapAccentColor: #e38b16;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: '72', '72full', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--sapBackgroundColor);
+            color: var(--sapTextColor);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, #0a6ed1 0%, #084b9c 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-content {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .app-title {
+            font-size: 1.75rem;
+            font-weight: 400;
+            margin-bottom: 0.25rem;
+        }
+        
+        .app-subtitle {
+            font-size: 1rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .version-badge {
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.85rem;
+            align-self: flex-start;
+            margin-top: 0.25rem;
+        }
+        
+        /* Main Content Styles */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        @media (min-width: 992px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .section {
+            background: var(--sapTileBackground);
+            border: var(--sapTileBorder);
+            border-radius: 0.5rem;
+            box-shadow: var(--sapCardShadow);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            padding: 1.25rem 1.5rem;
+            background: #fafafa;
+            border-bottom: 1px solid #eaeaea;
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--sapBrandColor);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-header i {
+            margin-right: 0.75rem;
+            color: var(--sapBrandColor);
+        }
+        
+        .section-content {
+            padding: 1.5rem;
+        }
+        
+        /* Web Apps Section */
+        .webapp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+        
+        .webapp-card {
+            border-left: 3px solid var(--sapBrandColor);
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+            background: #fcfcfc;
+            border-radius: 0.25rem;
+        }
+        
+        .webapp-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            border-left-color: var(--sapAccentColor);
+        }
+        
+        .webapp-card h3 {
+            margin: 0 0 0.75rem 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .webapp-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: #ebf5fe;
+            color: #0854a0;
+            text-decoration: none;
+            border-radius: 0.25rem;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        
+        .webapp-link:hover {
+            background: #d1e8ff;
+        }
+        
+        /* Services Section */
+        .services-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .services-table th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            background: #f5f9ff;
+            border-bottom: 2px solid #e0e0e0;
+            font-weight: 500;
+            color: #4a4a4a;
+        }
+        
+        .services-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+        
+        .services-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .services-table tr:hover td {
+            background: #f9f9f9;
+        }
+        
+        .service-name {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .endpoint-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .endpoint-link {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            background: #f0f7ff;
+            color: var(--sapBrandColor);
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(10, 110, 209, 0.2);
+            transition: all 0.2s;
+        }
+        
+        .endpoint-link:hover {
+            background: #e1f0ff;
+            border-color: rgba(10, 110, 209, 0.4);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+        
+        .v4-badge {
+            background: #e6f2fc;
+            color: #0a6ed1;
+        }
+        
+        .v2-badge {
+            background: #f1e8f9;
+            color: #8f46e9;
+        }
+        
+        .preview-badge {
+            background: #fff8e6;
+            color: #e38b16;
+        }
+        
+        /* Footer Styles */
+        footer {
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+            text-align: center;
+            color: #6a6d70;
+            font-size: 0.875rem;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        .system-info {
+            background: #f9f9f9;
+            padding: 1rem;
+            border-radius: 0.25rem;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="app-title">LIV Device Management</div>
+            <div class="app-subtitle">SAP CAP Application Server</div>
+            <div class="version-badge">Version 1.0.0</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard">
+            <div class="section">
+                <div class="section-header">
+                    <i>🌐</i> Web Applications
+                </div>
+                <div class="section-content">
+                    <div class="webapp-grid">
+                        <div class="webapp-card">
+                            <h3>Device Management Application</h3>
+                            <p>Main Fiori application for device management operations</p>
+                            <a href="/liv-app/webapp" class="webapp-link">Open Application</a>
+                        </div>
+                        <div class="webapp-card">
+                            <h3>Fiori Preview</h3>
+                            <p>Preview Fiori elements for all services</p>
+                            <a href="/liv-app/webapp/fiori.html" class="webapp-link">Open Preview</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <i>🔌</i> Service Endpoints
+                </div>
+                <div class="section-content">
+                    <table class="services-table">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Endpoints</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="service-name">Devices</td>
+                                <td>
+                                    <div class="endpoint-links">
+                                        <a href="/liv/Devices" class="endpoint-link">Devices <span class="badge v4-badge">V4</span></a>
+                                        <a href="/liv/v2/Devices" class="endpoint-link">Devices <span class="badge v2-badge">V2</span></a>
+                                        <a href="/liv/$metadata" class="endpoint-link">$metadata <span class="badge v4-badge">V4</span></a>
+                                        <a href="/liv/v2/$metadata" class="endpoint-link">$metadata <span class="badge v2-badge">V2</span></a>
+                                        <a href="/liv-app/webapp/fiori.html#preview-devices" class="endpoint-link">Fiori Preview <span class="badge preview-badge">Preview</span></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="service-name">Customers</td>
+                                <td>
+                                    <div class="endpoint-links">
+                                        <a href="/liv/Customers" class="endpoint-link">Customers <span class="badge v4-badge">V4</span></a>
+                                        <a href="/liv/v2/Customers" class="endpoint-link">Customers <span class="badge v2-badge">V2</span></a>
+                                        <a href="/liv/$metadata" class="endpoint-link">$metadata <span class="badge v4-badge">V4</span></a>
+                                        <a href="/liv/v2/$metadata" class="endpoint-link">$metadata <span class="badge v2-badge">V2</span></a>
+                                        <a href="/liv-app/webapp/fiori.html#preview-customers" class="endpoint-link">Fiori Preview <span class="badge preview-badge">Preview</span></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="service-name">Orders</td>
+                                <td>
+                                    <div class="endpoint-links">
+                                        <a href="/liv/Orders" class="endpoint-link">Orders <span class="badge v4-badge">V4</span></a>
+                                        <a href="/liv/v2/Orders" class="endpoint-link">Orders <span class="badge v2-badge">V2</span></a>
+                                        <a href="/liv/$metadata" class="endpoint-link">$metadata <span class="badge v4-badge">V4</span></a>
+                                        <a href="/liv/v2/$metadata" class="endpoint-link">$metadata <span class="badge v2-badge">V2</span></a>
+                                        <a href="/liv-app/webapp/fiori.html#preview-orders" class="endpoint-link">Fiori Preview <span class="badge preview-badge">Preview</span></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="service-name">DeliveryStatuses</td>
+                                <td>
+                                    <div class="endpoint-links">
+                                        <a href="/liv/DeliveryStatuses" class="endpoint-link">DeliveryStatuses <span class="badge v4-badge">V4</span></a>
+                                        <a href="/liv/v2/DeliveryStatuses" class="endpoint-link">DeliveryStatuses <span class="badge v2-badge">V2</span></a>
+                                        <a href="/liv/$metadata" class="endpoint-link">$metadata <span class="badge v4-badge">V4</span></a>
+                                        <a href="/liv/v2/$metadata" class="endpoint-link">$metadata <span class="badge v2-badge">V2</span></a>
+                                        <a href="/liv-app/webapp/fiori.html#preview-deliverystatuses" class="endpoint-link">Fiori Preview <span class="badge preview-badge">Preview</span></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="service-name">PaymentModes</td>
+                                <td>
+                                    <div class="endpoint-links">
+                                        <a href="/liv/PaymentModes" class="endpoint-link">PaymentModes <span class="badge v4-badge">V4</span></a>
+                                        <a href="/liv/v2/PaymentModes" class="endpoint-link">PaymentModes <span class="badge v2-badge">V2</span></a>
+                                        <a href="/liv/$metadata" class="endpoint-link">$metadata <span class="badge v4-badge">V4</span></a>
+                                        <a href="/liv/v2/$metadata" class="endpoint-link">$metadata <span class="badge v2-badge">V2</span></a>
+                                        <a href="/liv-app/webapp/fiori.html#preview-paymentmodes" class="endpoint-link">Fiori Preview <span class="badge preview-badge">Preview</span></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="service-name">Countries</td>
+                                <td>
+                                    <div class="endpoint-links">
+                                        <a href="/liv/Countries" class="endpoint-link">Countries <span class="badge v4-badge">V4</span></a>
+                                        <a href="/liv/v2/Countries" class="endpoint-link">Countries <span class="badge v2-badge">V2</span></a>
+                                        <a href="/liv/$metadata" class="endpoint-link">$metadata <span class="badge v4-badge">V4</span></a>
+                                        <a href="/liv/v2/$metadata" class="endpoint-link">$metadata <span class="badge v2-badge">V2</span></a>
+                                        <a href="/liv-app/webapp/fiori.html#preview-countries" class="endpoint-link">Fiori Preview <span class="badge preview-badge">Preview</span></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="system-info">
+            This is an automatically generated page. You can replace it with a custom ./app/index.html.
+        </div>
+    </div>
+
+    <footer>
+        <p>SAP CAP Server | Generated on <span id="current-date"></span></p>
+    </footer>
+
+    <script>
+        // Set current date in footer
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        // Add service status indicators
+        document.addEventListener('DOMContentLoaded', async () => {
+            const services = [
+                { name: 'Devices', path: '/liv/Devices' },
+                { name: 'Customers', path: '/liv/Customers' },
+                { name: 'Orders', path: '/liv/Orders' },
+                { name: 'DeliveryStatuses', path: '/liv/DeliveryStatuses' },
+                { name: 'PaymentModes', path: '/liv/PaymentModes' },
+                { name: 'Countries', path: '/liv/Countries' }
+            ];
+            
+            for (const service of services) {
+                try {
+                    const response = await fetch(service.path);
+                    const statusElement = document.createElement('span');
+                    statusElement.className = `status-indicator ${response.ok ? 'active' : 'inactive'}`;
+                    statusElement.title = response.ok ? 'Service is active' : 'Service unavailable';
+                    
+                    const serviceNameElement = document.querySelector(`.service-name:contains('${service.name}')`);
+                    if (serviceNameElement) {
+                        serviceNameElement.appendChild(statusElement);
+                    }
+                } catch (error) {
+                    console.error(`Error checking service ${service.name}:`, error);
+                }
+            }
+        });
+        
+        // Add contains helper for text matching
+        (function() {
+            const matches = Element.prototype.matches ||
+                            Element.prototype.matchesSelector || 
+                            Element.prototype.webkitMatchesSelector;
+            
+            Element.prototype.containsText = function(text) {
+                return this.textContent.includes(text);
+            };
+            
+            document.querySelectorAll = document.querySelectorAll || function(selectors) {
+                return [].slice.call(document.all).filter(function(element) {
+                    return matches.call(element, selectors);
+                });
+            };
+        })();
+        
+        // Add status indicator styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .status-indicator {
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                margin-left: 10px;
+                position: relative;
+            }
+            .status-indicator.active {
+                background-color: #2ecc71;
+                box-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
+            }
+            .status-indicator.inactive {
+                background-color: #e74c3c;
+                box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+            }
+            .status-indicator::after {
+                content: '';
+                position: absolute;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                top: -3px;
+                left: -3px;
+                opacity: 0.4;
+            }
+            .status-indicator.active::after {
+                border: 2px solid #2ecc71;
+                animation: pulse 1.5s infinite;
+            }
+            @keyframes pulse {
+                0% { transform: scale(0.8); opacity: 0.4; }
+                50% { transform: scale(1.2); opacity: 0; }
+                100% { transform: scale(0.8); opacity: 0.4; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+name: Deploy to SAP BTP
+
+on:
+  push:
+    branches: [main]  # Ensure this matches your branch name
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Remove environment selection for auto-triggered builds
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to BTP
+        uses: SAP/cloud-sdk-action@v1
+        with:
+          cloudFoundryApiEndpoint: https://api.cf.${{ secrets.CF_REGION }}.hana.ondemand.com
+          cloudFoundrySpace: ${{ secrets.CF_SPACE }}
+          cloudFoundryOrg: ${{ secrets.CF_ORG }}
+          cloudFoundryUsername: ${{ secrets.CF_USERNAME }}
+          cloudFoundryPassword: ${{ secrets.CF_PASSWORD }}
+          deployCommand: deploy -f

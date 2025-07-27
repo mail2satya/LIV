@@ -1,0 +1,21 @@
+{
+    "name": "liv-app",
+    "version": "1.0.0",
+    "description": "LIV Store UI5 Application",
+    "private": true,
+    "scripts": {
+      "start": "ui5 serve --port 8080",
+      "build": "ui5 build --clean-dest --include-task=generateManifestBundle generateVersionInfo"
+    },
+    "devDependencies": {
+      "@ui5/cli": "^3.0.0"
+    },
+    "dependencies": {
+      "@sap/ux-ui5-tooling": "1.*"
+    },
+    "ui5": {
+      "dependencies": [
+        "@sap/ux-ui5-tooling"
+      ]
+    }
+  }

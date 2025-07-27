@@ -1,0 +1,8 @@
+{
+    "name": "liv-db",
+    "version": "1.0.0",
+    "description": "Database definitions for LIV application",
+    "dependencies": {
+      "@sap/cds": "^8"
+    }
+  }

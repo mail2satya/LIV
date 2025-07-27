@@ -1,0 +1,1 @@
+using LivService as odata from './srv/service';

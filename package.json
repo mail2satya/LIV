@@ -1,0 +1,48 @@
+{
+  "name": "liv",
+  "version": "1.0.0",
+  "description": "A store application named LIV",
+  "repository": "https://github.com/your-github-username/LIV.git",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@cap-js-community/odata-v2-adapter": "^1",
+    "@sap/cds": "^9.1.0",
+    "express": "^4"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2",
+    "@sap/ux-specification": "^1.120.1",
+    "rimraf": "^3.0.2"
+  },
+  "scripts": {
+    "start": "cds run",
+    "build": "rimraf gen && cds build --for production",
+    "deploy": "cds deploy",
+    "watch-liv-app": "cds watch app/liv-app"
+  },
+  "cds": {
+    "build": {
+      "target": "gen"
+    },
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "model": ["db", "srv"],
+        "migrations": "db/migrations"
+      }
+    },
+    "migrations": {
+      "table": {
+        "name": "cds_migrations"
+      }
+    },
+        "credentials": {
+          "database": "db.sqlite"
+        }
+      },
+      "odata": {
+        "version": "v2",
+        "service": "LivService"
+      }
+    }

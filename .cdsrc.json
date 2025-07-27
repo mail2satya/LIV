@@ -1,0 +1,8 @@
+{
+    "build": {
+      "target": "./gen"
+    },
+    "app": {
+      "destination": "liv_app_destination"
+    }
+  }

@@ -1,0 +1,32 @@
+{
+    "xsappname": "liv-${space}",
+    "tenant-mode": "dedicated",
+    "description": "Security for LIV application",
+    "scopes": [
+      {
+        "name": "$XSAPPNAME.Viewer",
+        "description": "LIV Viewer"
+      },
+      {
+        "name": "$XSAPPNAME.Admin",
+        "description": "LIV Admin"
+      }
+    ],
+    "role-templates": [
+      {
+        "name": "Viewer",
+        "description": "LIV Viewer Role",
+        "scope-references": [
+          "$XSAPPNAME.Viewer"
+        ]
+      },
+      {
+        "name": "Admin",
+        "description": "LIV Admin Role",
+        "scope-references": [
+          "$XSAPPNAME.Admin",
+          "$XSAPPNAME.Viewer"
+        ]
+      }
+    ]
+  }

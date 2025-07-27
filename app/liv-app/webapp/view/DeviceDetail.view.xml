@@ -1,0 +1,71 @@
+<mvc:View
+    controllerName="liv.app.controller.DeviceDetail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core">
+    <Page
+        id="deviceDetailPage"
+        title="Device Detail - {name}"
+        showNavButton="true"
+        navButtonPress="onNavBack">
+        <content>
+            <ObjectHeader
+                title="{name}"
+                number="{
+                    path: 'price',
+                    formatter: '.formatter.formatPrice'
+                }"
+                numberUnit="{currency}"
+                responsive="true"
+                fullScreenOptimized="true">
+                <attributes>
+                    <ObjectAttribute title="Description" text="{description}"/>
+                    <ObjectAttribute title="IMEI" text="{IMEI}"/>
+                </attributes>
+            </ObjectHeader>
+
+            <f:SimpleForm
+                id="deviceDetailForm"
+                editable="false"
+                layout="ResponsiveGridLayout"
+                title="Device Information"
+                labelSpanXL="3"
+                labelSpanL="3"
+                labelSpanM="3"
+                labelSpanS="12"
+                adjustLabelSpan="false"
+                emptySpanXL="4"
+                emptySpanL="4"
+                emptySpanM="4"
+                emptySpanS="0"
+                columnsXL="1"
+                columnsL="1"
+                columnsM="1"
+                class="sapUiSmallMarginTop">
+                <f:content>
+                    <Label text="Name"/>
+                    <Text text="{name}"/>
+                    <Label text="Description"/>
+                    <Text text="{description}"/>
+                    <Label text="IMEI"/>
+                    <Text text="{IMEI}"/>
+                    <Label text="Price"/>
+                    <ObjectNumber
+                        number="{
+                            path: 'price',
+                            formatter: '.formatter.formatPrice'
+                        }"
+                        unit="{currency}"/>
+                </f:content>
+            </f:SimpleForm>
+        </content>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer/>
+                <Button text="Edit" icon="sap-icon://edit" press="onEdit"/>
+                <Button text="Delete" icon="sap-icon://delete" press="onDelete" type="Negative"/>
+            </Toolbar>
+        </footer>
+    </Page>
+</mvc:View>

@@ -1,0 +1,70 @@
+<mvc:View
+    controllerName="liv.app.controller.DeviceList"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:smartTable="sap.ui.comp.smarttable">
+    <Page
+        id="deviceListPage"
+        title="{i18n>deviceListTitle}"
+        showNavButton="false">
+        <content>
+            <smartTable:SmartTable
+                id="smartTableDevices"
+                entitySet="Devices"
+                tableType="ResponsiveTable"
+                useExportToExcel="true"
+                useTablePersonalisation="true"
+                header="{i18n>deviceListTitle}"
+                showRowCount="true"
+                enableAutoBinding="true"
+                demandPopin="true"
+                persistencyKey="SmartTable_Devices_PersistentKey"
+                enableAutoColumnWidth="true"
+                class="sapUiResponsiveContentPadding">
+                <smartTable:customToolbar>
+                    <Toolbar design="Transparent">
+                        <Title text="{i18n>deviceListTitle}" level="H2"/>
+                        <ToolbarSpacer/>
+                        <Button
+                            icon="sap-icon://add"
+                            tooltip="Add Device"
+                            press="onAddDevice"/>
+                    </Toolbar>
+                </smartTable:customToolbar>
+                <Table>
+                    <columns>
+                        <Column width="10em">
+                            <Text text="{i18n>deviceNameColumn}"/>
+                        </Column>
+                        <Column width="20em">
+                            <Text text="{i18n>deviceDescriptionColumn}"/>
+                        </Column>
+                        <Column width="10em">
+                            <Text text="{i18n>deviceIMEIColumn}"/>
+                        </Column>
+                        <Column width="8em" hAlign="End">
+                            <Text text="{i18n>devicePriceColumn}"/>
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem type="Navigation" press="onItemPress">
+                            <cells>
+                                <Text text="{name}"/>
+                                <Text text="{description}"/>
+                                <Text text="{IMEI}"/>
+                                <ObjectNumber
+                                    number="{
+                                        path: 'price',
+                                        formatter: '.formatter.formatPrice'
+                                    }"
+                                    unit="{currency}"
+                                    state="{= ${price} > 1000 ? 'Success' : 'Warning' }"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </smartTable:SmartTable>
+        </content>
+    </Page>
+</mvc:View>

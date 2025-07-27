@@ -1,0 +1,8 @@
+{
+    "name": "liv-srv",
+    "version": "1.0.0",
+    "description": "Service definitions for LIV application",
+    "dependencies": {
+      "@sap/cds": "^8"
+    }
+  }

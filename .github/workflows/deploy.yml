@@ -12,22 +12,18 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # Use Node.js 20 (required by CDS 9.x)
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: 20
+        node-version: 18
         cache: 'npm'
 
-    # Install dependencies including CDS
     - name: Install dependencies
-      run: npm ci
+      run: npm install --legacy-peer-deps
 
-    # Build using local CDS installation
     - name: Build project
       run: npx cds build
 
-    # Install Cloud Foundry CLI
     - name: Install Cloud Foundry CLI
       run: |
         wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
@@ -35,7 +31,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install cf8-cli -y
 
-    # Deploy to BTP
     - name: Deploy to SAP BTP
       env:
         CF_API: ${{ secrets.CF_API }}

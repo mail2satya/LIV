@@ -1,6 +1,6 @@
-const cds = require('@sap/cds');
-const proxy = require('@sap/cds-odata-v2-adapter-proxy')
-cds.on('bootstrap', app => app.use(proxy()))
+const cds = require('@sap/cds')
+const v2adapter = require('@cap-js-community/odata-v2-adapter')
+cds.on('bootstrap', app => app.use(v2adapter()))
 module.exports = cds.server
 
 module.exports = cds.service.impl('LivService', async function() {

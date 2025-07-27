@@ -2,34 +2,41 @@ name: Deploy to SAP BTP
 
 on:
   push:
-    branches: [main]  # Ensure this matches your branch name
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # Remove environment selection for auto-triggered builds
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
 
-      - name: Install dependencies
-        run: npm ci
+    - name: Install dependencies
+      run: npm ci
 
-      - name: Build project
-        run: npm run build
+    - name: Build project
+      run: npm run build
 
-      - name: Deploy to BTP
-        uses: cloudfoundry-community/github-action-cli@v1
-        with:
-          cloudFoundryApiEndpoint: https://api.cf.${{ secrets.CF_REGION }}.hana.ondemand.com
-          cloudFoundrySpace: ${{ secrets.CF_SPACE }}
-          cloudFoundryOrg: ${{ secrets.CF_ORG }}
-          cloudFoundryUsername: ${{ secrets.CF_USERNAME }}
-          cloudFoundryPassword: ${{ secrets.CF_PASSWORD }}
-          deployCommand: deploy -f
+    - name: Install Cloud Foundry CLI
+      run: |
+        wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+        echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+        sudo apt-get update
+        sudo apt-get install cf8-cli -y
+
+    - name: Deploy to SAP BTP
+      env:
+        CF_API: ${{ secrets.CF_API }}
+        CF_ORG: ${{ secrets.CF_ORG }}
+        CF_SPACE: ${{ secrets.CF_SPACE }}
+        CF_USERNAME: ${{ secrets.CF_USERNAME }}
+        CF_PASSWORD: ${{ secrets.CF_PASSWORD }}
+      run: |
+        cf login -a $CF_API -u "$CF_USERNAME" -p "$CF_PASSWORD" -o $CF_ORG -s $CF_SPACE
+        cf create-service-push

@@ -1,91 +1,22 @@
-_schema-version: "3.2"
-ID: liv
+ID: liv-device-management
+_schema-version: '3.1'
 version: 1.0.0
-description: "A store application named LIV"
-
-parameters:
-  enable-parallel-deployments: true
-
-build-parameters:
-  before-all:
-    - builder: custom
-      commands:
-        - npm install --production
-        - npx cds build --production
 
 modules:
-  - name: liv-srv
-    type: nodejs
-    path: srv
-    build-parameters:
-      builder: npm
-    provides:
-      - name: srv-api
-        properties:
-          srv-url: "${default-url}"
-    parameters:
-      buildpack: nodejs_buildpack
-    requires:
-      - name: liv-db
-      - name: liv-uaa
-
-  - name: liv-db-deployer
-    type: hdb
-    path: db
-    parameters:
-      buildpack: nodejs_buildpack
-    requires:
-      - name: liv-db
-
   - name: liv-app
-    type: html5
-    path: app/liv-app
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm install
-        - npm run build -- --config ./ui5-deploy.yaml
-      supported-platforms: []
+    type: nodejs
+    path: .
     parameters:
-      disk-quota: 256M
-      memory: 256M
+      buildpack: nodejs_buildpack
+      memory: 512M
+      disk-quota: 512M
     requires:
-      - name: liv-uaa
-      - name: srv-api
-        group: destinations
-        properties:
-          name: srv-api
-          url: "~{srv-url}"
-          forwardAuthToken: true
-      - name: liv_app_destination
+      - name: liv-db
+        group: databases
 
 resources:
   - name: liv-db
     type: com.sap.xs.hdi-container
     parameters:
       service: hana
-      service-plan: hdi-shared # or 'standard' for a dedicated instance
-    properties:
-      hdi-container-name: "${service-name}"
-
-  - name: liv-uaa
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: xsuaa
-      service-plan: application
-      path: ./xs-security.json
-      config:
-        xsappname: liv-${space} # Unique name for your XSUAA instance
-        tenant-mode: dedicated
-        oauth2-configuration:
-          token-validity: 900
-          refresh-token-validity: 3600
-
-  - name: liv_app_destination
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: destination
-      service-plan: lite
-      config:
-        HTML5Runtime_Enabled: true
+      service-plan: hdi-shared

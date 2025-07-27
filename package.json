@@ -18,9 +18,9 @@
   },
   "scripts": {
     "start": "cds run",
-    "build": "rimraf gen && cds build --for production",
-    "deploy": "cds deploy",
-    "watch-liv-app": "cds watch app/liv-app"
+    "build": "cds build",
+    "deploy": "cf create-service-push"
+    
   },
   "cds": {
     "build": {

@@ -1,0 +1,10 @@
+applications:
+- name: liv-device-management
+  buildpack: nodejs_buildpack
+  memory: 512M
+  disk_quota: 512M
+  services:
+    - liv-db
+  env:
+    NODE_ENV: production
+    DEBUG: cds*

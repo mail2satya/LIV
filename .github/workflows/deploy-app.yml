@@ -1,0 +1,59 @@
+name: Deploy Application
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [deploy-app]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install --legacy-peer-deps
+      
+    - name: Build project
+      run: npx cds build
+      
+    - name: Install CF CLI
+      run: |
+        wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+        echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+        sudo apt-get update
+        sudo apt-get install cf8-cli -y
+        
+    - name: Deploy to SAP BTP
+      env:
+        CF_API: ${{ secrets.CF_API }}
+        CF_ORG: ${{ secrets.CF_ORG }}
+        CF_SPACE: ${{ secrets.CF_SPACE }}
+        CF_USERNAME: ${{ secrets.CF_USERNAME }}
+        CF_PASSWORD: ${{ secrets.CF_PASSWORD }}
+      run: |
+        cf login -a $CF_API -u "$CF_USERNAME" -p "$CF_PASSWORD" -o $CF_ORG -s $CF_SPACE
+        
+        # Create HDI container
+        if ! cf service liv-db > /dev/null 2>&1; then
+          cf create-service hana hdi-shared liv-db
+        fi
+        
+        # Deploy application
+        cf push liv-device-management \
+          --buildpack nodejs_buildpack \
+          -m 512M \
+          -k 512M \
+          --no-start
+        
+        # Bind service and start application
+        cf bind-service liv-device-management liv-db
+        cf restart liv-device-management

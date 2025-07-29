@@ -1,5 +1,5 @@
 {
-    "name": "liv-db",
+    "name": "liv-hana-instance",
     "version": "1.0.0",
     "description": "Database definitions for LIV application",
     "dependencies": {

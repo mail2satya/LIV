@@ -43,8 +43,8 @@ jobs:
         cf login -a $CF_API -u "$CF_USERNAME" -p "$CF_PASSWORD" -o $CF_ORG -s $CF_SPACE
         
         # Create HDI container
-        if ! cf service liv-db > /dev/null 2>&1; then
-          cf create-service hana hdi-shared liv-db
+        if ! cf service liv-hana-instance > /dev/null 2>&1; then
+          cf create-service hana hdi-shared liv-hana-instance
         fi
         
         # Deploy application
@@ -55,5 +55,5 @@ jobs:
           --no-start
         
         # Bind service and start application
-        cf bind-service liv-device-management liv-db
+        cf bind-service liv-device-management liv-hana-instance
         cf restart liv-device-management

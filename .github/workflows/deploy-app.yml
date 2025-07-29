@@ -1,29 +1,37 @@
-name: Deploy Application
+name: Stable Deployment
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
-  repository_dispatch:
-    types: [deploy-app]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production
     steps:
     - name: Checkout
       uses: actions/checkout@v3
       
+    - name: Clean Install
+      run: |
+        rm -rf node_modules
+        rm -f package-lock.json
+        
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: 20
+        node-version: 18
         cache: 'npm'
         
-    - name: Install dependencies
-      run: npm install --legacy-peer-deps
+    - name: Install Dependencies
+      run: npm install --legacy-peer-deps --no-audit
+
+    - name: Check Compatibility
+      run: |
+        npx npm-check --skip-unused -E  
       
-    - name: Build project
-      run: npx cds build
+    - name: Build Project
+      run: npm run build
       
     - name: Install CF CLI
       run: |
@@ -32,7 +40,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install cf8-cli -y
         
-    - name: Deploy to SAP BTP
+    - name: Deploy to BTP
       env:
         CF_API: ${{ secrets.CF_API }}
         CF_ORG: ${{ secrets.CF_ORG }}
@@ -41,19 +49,4 @@ jobs:
         CF_PASSWORD: ${{ secrets.CF_PASSWORD }}
       run: |
         cf login -a $CF_API -u "$CF_USERNAME" -p "$CF_PASSWORD" -o $CF_ORG -s $CF_SPACE
-        
-        # Create HDI container
-        if ! cf service liv-db > /dev/null 2>&1; then
-          cf create-service postgresql-db standard liv-db
-        fi
-        
-        # Deploy application
-        cf push liv-device-management \
-          --buildpack nodejs_buildpack \
-          -m 512M \
-          -k 512M \
-          --no-start
-        
-        # Bind service and start application
-        cf bind-service liv-device-management liv-db
-        cf restart liv-device-management
+        cf push

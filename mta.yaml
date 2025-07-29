@@ -11,12 +11,13 @@ modules:
       memory: 512M
       disk-quota: 512M
     requires:
-      - name: liv-hana-instance
-        group: databases
+      - name: liv-db # Renamed the requirement to reflect PostgreSQL
+        # group: databases # This line can be removed as it's typically for HDI containers
 
 resources:
-  - name: liv-hana-instance
-    type: com.sap.xs.hdi-container
+  - name: liv-db # New name for your PostgreSQL service instance
+    type: org.cloudfoundry.managed-service # This indicates a managed service on CF
     parameters:
-      service: hana
-      service-plan: hdi-shared
+      service: postgresql-db # The service name for PostgreSQL on BTP Hyperscaler
+      service-plan: standard # Or 'lite' for trial accounts, 'enterprise-lite' depending on your region/offer
+      # You can add tags or other parameters if needed, e.g., 'tags: [ "cap" ]'

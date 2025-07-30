@@ -2,45 +2,45 @@ name: Stable Deployment
 
 on:
   push:
-    branches: [main]
+    branches: [stable-deploy]
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@v3
       
-    - name: Clean Install
-      run: |
-        rm -rf node_modules
-        rm -f package-lock.json
-        
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: 18
         cache: 'npm'
+        cache-dependency-path: ''  # Clear cache dependency path
+
+    - name: Clean installation
+      run: |
+        rm -rf node_modules
+        rm -f package-lock.json
         
     - name: Install Dependencies
-      run: npm install --legacy-peer-deps --no-audit
-
-    - name: Check Compatibility
-      run: |
-        npx npm-check --skip-unused -E  
+      run: npm install --legacy-peer-deps --no-audit --no-package-lock
+      
+    - name: Verify package versions
+      run: npm run verify-versions
       
     - name: Build Project
       run: npm run build
       
-    - name: Install CF CLI
+    - name: Install Cloud Foundry CLI
       run: |
         wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
         echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
         sudo apt-get update
         sudo apt-get install cf8-cli -y
         
-    - name: Deploy to BTP
+    - name: Deploy to SAP BTP
       env:
         CF_API: ${{ secrets.CF_API }}
         CF_ORG: ${{ secrets.CF_ORG }}
